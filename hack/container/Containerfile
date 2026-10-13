@@ -1,0 +1,15 @@
+ARG SPEAKEASY_VERSION
+ARG GO_IMAGE
+ARG TERRAFORM_VERSION=1.13.4
+
+FROM ghcr.io/speakeasy-api/speakeasy:v${SPEAKEASY_VERSION} AS speakeasy
+FROM hashicorp/terraform:${TERRAFORM_VERSION} AS terraform
+FROM ${GO_IMAGE}
+
+COPY --from=speakeasy /usr/local/bin/speakeasy /usr/local/bin/speakeasy
+COPY --from=terraform /bin/terraform /usr/local/bin/terraform
+
+ENV PATH=/usr/local/go/bin:/usr/local/bin:/usr/bin:/bin
+WORKDIR /workspace
+
+RUN test -s /etc/ssl/certs/ca-certificates.crt && go version && speakeasy --version && terraform version

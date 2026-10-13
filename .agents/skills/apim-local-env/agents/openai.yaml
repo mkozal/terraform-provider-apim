@@ -1,0 +1,3 @@
+interface:
+  display_name: "APIM Local Environment"
+  short_description: "Prepare provider generation and test tooling"
