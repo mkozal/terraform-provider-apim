@@ -41,6 +41,9 @@ func (data *PortalResourceModel) toConfiguredPortalRequest(ctx context.Context, 
 		requestData.Structure = nil
 	case structureConfigured:
 		diags.Append(knownPortalNavigationInput(ctx, "structure", planStructure)...)
+		if !diags.HasError() && planStructure.Attributes()["top_navbar"].IsNull() {
+			diags.AddAttributeError(path.Root("structure").AtName("top_navbar"), "Missing portal top navbar", "Set structure.top_navbar to an explicit list. Use [] to clear navigation, or omit structure to preserve navigation.")
+		}
 		if !diags.HasError() {
 			diags.Append(plan.GetAttribute(ctx, path.Root("structure"), &requestData.Structure)...)
 		}

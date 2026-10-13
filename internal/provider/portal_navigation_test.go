@@ -83,6 +83,7 @@ func TestConfiguredPortalRequest(t *testing.T) {
 	newStructure := portalTestStructure(newNavigation)
 	emptyNavigation := portalTestNavigation()
 	emptyStructure := portalTestStructure(emptyNavigation)
+	emptyStructureConfig := portalTestStructure(nullNavigation)
 	unknownPath := types.ListValueMust(portalTestPathType, []attr.Value{
 		types.ObjectValueMust(portalTestPathType.AttrTypes, map[string]attr.Value{
 			"path": types.StringUnknown(), "display_name": types.StringNull(),
@@ -104,6 +105,8 @@ func TestConfiguredPortalRequest(t *testing.T) {
 		{"structure uses resolved plan", nullNavigation, newStructure, unknownNavigation, newStructure, false, false, `{"hrid":"test-portal","name":"Test Portal","structure":{"topNavbar":[{"path":"/new"}]}}`, false},
 		{"clear legacy", emptyNavigation, nullStructure, emptyNavigation, unknownStructure, false, false, `{"hrid":"test-portal","name":"Test Portal"}`, false},
 		{"clear structure", nullNavigation, emptyStructure, unknownNavigation, emptyStructure, false, false, `{"hrid":"test-portal","name":"Test Portal","structure":{}}`, false},
+		{"empty structure rejected", nullNavigation, emptyStructureConfig, unknownNavigation, emptyStructureConfig, false, false, "", true},
+		{"unknown structure resolves to missing navbar", nullNavigation, unknownStructure, unknownNavigation, emptyStructureConfig, false, false, "", true},
 		{"omitted preserves structure", nullNavigation, nullStructure, unknownNavigation, unknownStructure, false, false, `{"hrid":"test-portal","name":"Test Portal","structure":{"topNavbar":[{"path":"/old"}]}}`, false},
 		{"omitted preserves legacy state", nullNavigation, nullStructure, unknownNavigation, unknownStructure, true, false, `{"hrid":"test-portal","name":"Test Portal","navigation":[{"path":"/old"}]}`, false},
 		{"create without navigation", nullNavigation, nullStructure, unknownNavigation, unknownStructure, true, true, `{"hrid":"test-portal","name":"Test Portal"}`, false},
@@ -183,6 +186,7 @@ func TestPortalAliasPlanModifiers(t *testing.T) {
 	newStructure := portalTestStructure(newNavigation)
 	emptyNavigation := portalTestNavigation()
 	emptyStructure := portalTestStructure(emptyNavigation)
+	emptyStructureConfig := portalTestStructure(nullNavigation)
 
 	tests := []struct {
 		name             string
@@ -206,6 +210,8 @@ func TestPortalAliasPlanModifiers(t *testing.T) {
 		{"unknown structure keeps navigation unknown", nullNavigation, unknownStructure, unknownNavigation, unknownStructure, unknownNavigation, unknownStructure, false, false},
 		{"creation has no prior structure", newNavigation, nullStructure, newNavigation, unknownStructure, newNavigation, unknownStructure, true, false},
 		{"conflicting inputs rejected", newNavigation, newStructure, newNavigation, newStructure, newNavigation, newStructure, false, true},
+		{"empty structure rejected on creation", nullNavigation, emptyStructureConfig, unknownNavigation, emptyStructureConfig, unknownNavigation, emptyStructureConfig, true, true},
+		{"empty structure rejected on update", nullNavigation, emptyStructureConfig, unknownNavigation, emptyStructureConfig, unknownNavigation, emptyStructureConfig, false, true},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

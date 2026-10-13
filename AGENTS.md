@@ -162,6 +162,8 @@ An overlay target cannot use `value`, `count`, `length`, `match` or `search` as 
 
 An overlay action whose target matches nothing is ignored without an error: after a generation, grep `.speakeasy/output/computed.yaml` and the generated resource for each annotation you added.
 
+Portal navigation uses explicit clearing: omitted/null `structure` and `navigation` preserve existing entries, while `structure = { top_navbar = [] }` clears them. The existing `PortalStructure` modifier rejects a configured structure without a non-null `top_navbar`; the request builder checks resolved apply values too. This conditional requirement is marked TBD in the overlay and generated resource documentation. Do not add an implicit empty-list default: it could clear imported or otherwise unmanaged navigation.
+
 Key Speakeasy overlay annotations:
 
 - `x-speakeasy-param-computed: true` — mark a field as computed

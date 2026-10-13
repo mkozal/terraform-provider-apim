@@ -15,7 +15,7 @@ func PortalStructure() planmodifier.Object {
 type portalStructure struct{}
 
 func (portalStructure) Description(context.Context) string {
-	return "Preserves computed structure unless configured legacy navigation changes."
+	return "Requires an explicit top navbar for configured structure and preserves computed structure unless legacy navigation changes."
 }
 
 func (m portalStructure) MarkdownDescription(ctx context.Context) string {
@@ -31,6 +31,17 @@ func (portalStructure) PlanModifyObject(ctx context.Context, req planmodifier.Ob
 	if !req.ConfigValue.IsNull() && !req.ConfigValue.IsUnknown() && !navigation.IsNull() && !navigation.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(req.Path, "Conflicting portal navigation", "navigation and structure cannot be configured together. Configure one navigation representation.")
 		return
+	}
+	if !req.ConfigValue.IsNull() && !req.ConfigValue.IsUnknown() {
+		var topNavbar types.List
+		resp.Diagnostics.Append(req.Config.GetAttribute(ctx, req.Path.AtName("top_navbar"), &topNavbar)...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+		if topNavbar.IsNull() {
+			resp.Diagnostics.AddAttributeError(req.Path.AtName("top_navbar"), "Missing portal top navbar", "Set structure.top_navbar to an explicit list. Use [] to clear navigation, or omit structure to preserve navigation.")
+			return
+		}
 	}
 	if !req.PlanValue.IsUnknown() || req.ConfigValue.IsUnknown() || req.State.Raw.IsNull() {
 		return

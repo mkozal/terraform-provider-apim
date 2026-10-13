@@ -16,21 +16,23 @@ Portal Resource
 resource "apim_portal" "developer-portal" {
   hrid = "developer-portal"
   name = "[Terraform] Developer Portal"
-  # will be displayed in that order
-  navigation = [
-    {
-      path         = "/apis"
-      display_name = "APIs"
-    },
-    {
-      path         = "/docs"
-      display_name = "Documentation"
-    },
-    {
-      path         = "/docs/getting-started"
-      display_name = "Getting Started"
-    }
-  ]
+  # Entries appear in list order. Use top_navbar = [] to explicitly clear them.
+  structure = {
+    top_navbar = [
+      {
+        path         = "/apis"
+        display_name = "APIs"
+      },
+      {
+        path         = "/docs"
+        display_name = "Documentation"
+      },
+      {
+        path         = "/docs/getting-started"
+        display_name = "Getting Started"
+      }
+    ]
+  }
 }
 ```
 
@@ -51,7 +53,7 @@ previously-active theme; the portal-next UI will then lazily fall back to a fres
 - `environment_id` (String) environment ID
 - `navigation` (Attributes List, Deprecated) Deprecated. Use `structure.top_navbar` instead. Configure only one of `navigation` or `structure`; APIM returns both aliases in state. (see [below for nested schema](#nestedatt--navigation))
 - `organization_id` (String) organization ID
-- `structure` (Attributes) Portal navigation grouped by area. (see [below for nested schema](#nestedatt--structure))
+- `structure` (Attributes) Portal navigation grouped by area. Omitting both `structure` and `navigation`, or setting both to `null`, preserves existing navigation, including after import and during unrelated updates. When `structure` is configured, `top_navbar` must be an explicit list: use `structure = { top_navbar = [] }` to clear navigation. `structure = {}` and `structure = { top_navbar = null }` are rejected rather than clearing entries implicitly. TBD (to be discussed): requiring an explicit `top_navbar` within a configured structure. (see [below for nested schema](#nestedatt--structure))
 
 ### Read-Only
 
