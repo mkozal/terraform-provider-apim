@@ -78,9 +78,11 @@ Files listed in `.genignore` are **not** overwritten by Speakeasy even though si
 | `examples/resources/**` | Minimal per-resource examples for registry docs (curated, in `.genignore`) |
 | `tests/**` | **Entirely hand-written** — acceptance tests, example tests, testdata, utilities; nothing here is generated |
 | `internal/provider/gravitee_cloud.go` | Gravitee Cloud auth / server URL resolution |
+| `internal/provider/portal_navigation.go` | Config-aware portal request selection; called from marked regions in `portal_resource.go` |
 | `internal/provider/customtypes/**` | `TrimmedString`, `RFC3339` custom Terraform types (referenced from overlays) |
 | `internal/planmodifiers/stringplanmodifier/immutable.go`, `normalize_path.go`, `trim_trailing_slash.go` | Custom plan modifiers |
 | `internal/planmodifiers/listplanmodifier/ignore_empty_list.go`, `no_removal_by_name.go` | Custom plan modifiers |
+| `internal/planmodifiers/listplanmodifier/portal_navigation.go`, `internal/planmodifiers/objectplanmodifier/portal_structure.go` | Portal alias plan modifiers; preserve computed state unless the configured counterpart changes |
 | `internal/planmodifiers/mapplanmodifier/response_template.go` | Custom plan modifier |
 | `internal/validators/listvalidators/sorted_by*.go` | Custom validators: lists the platform reports in its own order |
 | `internal/listkeys/` | Reads the identifying attributes of a list's elements, for the validators and modifiers above |

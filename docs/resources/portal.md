@@ -44,11 +44,14 @@ resource "apim_portal" "developer-portal" {
 
 ### Optional
 
+- `active_theme_hrid` (String) HRID of the Theme this portal should use as its active theme. When set, applying the portal
+marks the referenced theme as active (enabled) and disables every other PORTAL_NEXT theme
+in the environment. Leaving this field unset clears the reference and disables the
+previously-active theme; the portal-next UI will then lazily fall back to a fresh default theme.
 - `environment_id` (String) environment ID
-- `navigation` (Attributes List) The portal's navigation hierarchy as a flat list of paths.
-Paths are ordered — the order in the list is preserved.
-Intermediate folders are implicitly created if not listed explicitly. (see [below for nested schema](#nestedatt--navigation))
+- `navigation` (Attributes List, Deprecated) Deprecated. Use `structure.top_navbar` instead. Configure only one of `navigation` or `structure`; APIM returns both aliases in state. (see [below for nested schema](#nestedatt--navigation))
 - `organization_id` (String) organization ID
+- `structure` (Attributes) Portal navigation grouped by area. (see [below for nested schema](#nestedatt--structure))
 
 ### Read-Only
 
@@ -56,6 +59,26 @@ Intermediate folders are implicitly created if not listed explicitly. (see [belo
 
 <a id="nestedatt--navigation"></a>
 ### Nested Schema for `navigation`
+
+Optional:
+
+- `display_name` (String) Optional human-friendly label for this path node.
+Listing a path explicitly is the only way to attach a displayName.
+- `path` (String) A slash-separated path defining the navigation hierarchy.
+Intermediate folders are implicitly created if not listed explicitly.
+Not Null
+
+
+<a id="nestedatt--structure"></a>
+### Nested Schema for `structure`
+
+Optional:
+
+- `top_navbar` (Attributes List) Top navbar entries as an ordered list of paths.
+Intermediate folders are implicitly created if not listed explicitly. (see [below for nested schema](#nestedatt--structure--top_navbar))
+
+<a id="nestedatt--structure--top_navbar"></a>
+### Nested Schema for `structure.top_navbar`
 
 Optional:
 

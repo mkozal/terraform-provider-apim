@@ -22,6 +22,13 @@ variable "portal_hrid" {
   type = string
 }
 
+locals {
+  listing_locations = {
+    apis     = "/apis-${var.portal_hrid}"
+    featured = "/apis-${var.portal_hrid}/featured-${var.portal_hrid}"
+  }
+}
+
 resource "apim_portal" "primary" {
   environment_id  = var.environment_id
   organization_id = var.organization_id
@@ -29,10 +36,10 @@ resource "apim_portal" "primary" {
   name            = "Primary Portal"
   navigation = [
     {
-      path = "/apis-${var.portal_hrid}"
+      path = local.listing_locations.apis
     },
     {
-      path = "/apis-${var.portal_hrid}/featured-${var.portal_hrid}"
+      path = local.listing_locations.featured
     }
   ]
 }
@@ -167,9 +174,9 @@ resource "apim_portal_listing" "test" {
   portal_hrid     = apim_portal.primary.hrid
   hrid            = var.hrid
   apis = [for entry in var.apis : {
-    # looks odd, but we do this so that we have stable test where the API will be created first without "depends on"
+    # Resource references ensure the APIs exist before the listing is applied.
     api_hrid = entry.api == "first" ? apim_apiv4.first.hrid : apim_apiv4.second.hrid
-    location = entry.location
+    location = local.listing_locations[entry.location]
     order    = entry.order
   }]
 }
